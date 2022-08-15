@@ -7,27 +7,38 @@ Equipe: Alaim de Jesus Leão Costa; Henrique Pereira Viana; Klauber Araujo Sousa
 Experimento: Efeito rsr no sinal de áudio
 """
 
+from array import array
 from IPython.display import Audio
+from statistics import median
 import numpy as np
 import sounddevice as sd
 import soundfile as sf
-import math 
+import math
+
 
 
 nPower = 0.0001
-temp_Rep = 20 # acima desse valor ultrapassa o limite da matriz criada
+temp_Rep = 10 # acima desse valor ultrapassa o limite da matriz criada
 arquivoAudio = 'boate_azul.wav'
 
 [data, taxaAmost] = sf.read(arquivoAudio) #Faz a leitura do arquivo de audio e reorna a taxa de amostragem e um array dos dados
 
+data = data[1:temp_Rep*taxaAmost,1]
+
 n = math.sqrt(nPower)*np.random.randn(temp_Rep*taxaAmost, 1) #calculo a raiz quadrada de nPower e multiplico por randn que criar numeros aleatorios em uma matriz n por 1
+print(np.shape(data))
+print(data)
 
-#data = data*temp_Rep
+dataModif = (data*n)
 
-#sinalRuido = data*n
+Ps = np.mean(data**2) # potencia de interesse do sinal de áudio
+Pn = np.var(n) # variancia dos valores de n que representam a potencia de ruído do sinal
+RSR = Ps/Pn
 
-sd.play(data, taxaAmost) # Reproduz o arquivo de audio original
-status = sd.wait() # Aguarda o arquivo terminar de reproduzir 
 
-#sd.play(sinalRuido, taxaAmost)
+
+#sd.play(data, taxaAmost) # Reproduz o arquivo de audio original
 #status = sd.wait() # Aguarda o arquivo terminar de reproduzir 
+
+sd.play(dataModif, taxaAmost)
+status = sd.wait() # Aguarda o arquivo terminar de reproduzir 

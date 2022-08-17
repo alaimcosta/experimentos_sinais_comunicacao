@@ -21,24 +21,25 @@ nPower = 0.0001
 temp_Rep = 10 # acima desse valor ultrapassa o limite da matriz criada
 arquivoAudio = 'boate_azul.wav'
 
-[data, taxaAmost] = sf.read(arquivoAudio) #Faz a leitura do arquivo de audio e reorna a taxa de amostragem e um array dos dados
+data, taxaAmost = sf.read(arquivoAudio) #Faz a leitura do arquivo de audio e reorna a taxa de amostragem e um array dos dados
 
-data = data[1:temp_Rep*taxaAmost,1]
+data = data[0:temp_Rep*taxaAmost, 0]
 
-n = math.sqrt(nPower)*np.random.randn(temp_Rep*taxaAmost, 1) #calculo a raiz quadrada de nPower e multiplico por randn que criar numeros aleatorios em uma matriz n por 1
-print(np.shape(data))
-print(data)
+n = math.sqrt(nPower)*np.random.randn(temp_Rep*taxaAmost) #calculo a raiz quadrada de nPower e multiplico por randn que cria amostras pade distribuição padrão
 
-dataModif = (data*n)
+sinalArr = np.around(data)
+
+data_edit = data + n
 
 Ps = np.mean(data**2) # potencia de interesse do sinal de áudio
 Pn = np.var(n) # variancia dos valores de n que representam a potencia de ruído do sinal
 RSR = Ps/Pn
 
+print("Valor de relação sinal ruído", RSR)
 
 
-#sd.play(data, taxaAmost) # Reproduz o arquivo de audio original
-#status = sd.wait() # Aguarda o arquivo terminar de reproduzir 
-
-sd.play(dataModif, taxaAmost)
+sd.play(data, taxaAmost) # Reproduz o arquivo de audio original
 status = sd.wait() # Aguarda o arquivo terminar de reproduzir 
+
+sd.play(data_edit, taxaAmost)
+status = sd.wait() 

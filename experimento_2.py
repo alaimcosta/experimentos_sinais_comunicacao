@@ -7,62 +7,33 @@ Equipe: Alaim de Jesus Leão Costa; Henrique Pereira Viana; Klauber Araujo Sousa
 Experimento: Quantização de sinal de áudio
 """
 import numpy as np
-from scipy.io import wavfile
 import matplotlib . pyplot as plt
 import soundfile as sf
 
-
-[date, taxaAmost] = sf.read('boate_azul.wav') # retorna a taxa de amostragem e um array dos dados
-
-
-plt.plot(date[18000:20000]) # dados do arquivo de áudio
-plt.title (" Sinal de Entrada ")
-plt.ylabel (" Amplitude do Sinal ") 
-plt.xlabel (" Tempo ") 
-plt.grid ()
-plt.show()
-
-
-"""
-Caracteristicas de Quantização
-"""
-
-
-PP = 2
-#PP = max([date])-min([date]); #Pico a Pico do Sinal
-b=1 #Quantidade de Bits do Sinal
-L=2**b #Quantidade de Niveis de Quantização
-v= PP/(L-1) #Largura de Niveis de Quantização
-
-
-np.logical_and(min([date]),max([date]))
-
-n = np.linspace(min([date]),max([date])+v, num=v, dtype='float') #Niveis de quantização, v é  passo 
-
-
+date, taxaAmost = sf.read('boate_azul.wav') # retorna a taxa de amostragem e um array dos dados
+tempResp = 20
+date = date[0:tempResp*taxaAmost, 0]  # multiplica a amostragem pelo tempo de resposta, na posição inicial do vetor
 
 """
 Digitalização do Sinal
 """
-
-digita = np.zeros(len(date))
-
-for i in range (len(date)):
-    for j in range (L):
-        if date[i]>=n[j] and date[i]<=n[j+1]:
-            digita[i]=n[j]
-            
-
+#print("maximo", max(date))
+valorQuat = (max(date)-min(date)) #Pico a Pico do Sinal
+b=4 #Quantidade de Bits do Sinal
+niveis=2**b #Quantidade de Niveis de Quantização
+delta = valorQuat/(niveis-1) # Passo do quantizador, especifica a largura do nivel de Quantização
+sinalAmostrado = date/delta 
+sinalArr = np.around(sinalAmostrado)
 
 """
 Plot do Sinal de Entrada e do Sinal Digitalizado
 """
-
-plt.plot(date[17000:20000], 'r --')
-#plt.plot(digita)
-plt.title ('Sinal Quantizado a uma Taxa de % bits ')
+plt.plot(8*date[18000:20000], 'b', label=' Original') # dados do arquivo de áudio
+plt.plot(sinalArr[18000:20000], 'r--', label=' Quantizado')
+plt.title ('Sinal Quantizado ')
 plt.ylabel (" Amplitude do Sinal ") 
 plt.xlabel (" Tempo ") 
+plt.legend(loc=2)
 plt.grid ()
 plt.show()
 
